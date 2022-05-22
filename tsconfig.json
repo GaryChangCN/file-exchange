@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "esModuleInterop": true,
+        "allowJs": false,
+        "outDir": "./build",
+        "typeRoots": ["./node_modules/@types"],
+        "target": "ES6",
+    },
+    "include": ["src/**/*"]
+}
