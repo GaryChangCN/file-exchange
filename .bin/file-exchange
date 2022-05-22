@@ -1,0 +1,45 @@
+#!/usr/bin/env node
+
+const path = require('path')
+const main = require('../dist/index').default
+const { program } = require('commander')
+const os = require('os')
+const qrcode = require('qrcode-terminal')
+
+const cwd = process.cwd()
+
+program.version('0.0.1')
+
+program.option('-p, --port <number>', 'listen port', 3000)
+program.option('-d, --dir-path <string>', 'work path to start server', './')
+
+program.parse(process.argv)
+
+const opts = program.opts()
+
+const config = {
+    fileDir: path.resolve(cwd, opts.dirPath),
+    workPort: opts.port,
+}
+
+const ipInfos = Object.entries(os.networkInterfaces())
+    .map(([name, nets]) => [name, nets.filter(net => net.family === 'IPv4' && !net.internal)])
+    .reduce((prev, cur) => Object.assign(prev, cur[1].length ? { [cur[0]]: cur[1].map(e => e.address) } : null), {})
+
+main(config, server => {
+    const port = server.address().port
+
+    Object.entries(ipInfos).forEach(([en, ips]) => {
+        if (ips.length === 0) {
+            return
+        }
+        const link = `http://${ips[0]}:${port}` 
+        qrcode.generate(link, {
+            small: true
+        }, qr => {
+            console.log('Link: ' + link)
+            console.log(qr)
+        })
+    })
+    
+})

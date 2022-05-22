@@ -10,6 +10,7 @@
                 padding: 0;
                 margin: 0;
                 background-color: #eee;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, segoe ui, Roboto, Helvetica, Arial, sans-serif;
             }
             * {
                 box-sizing: border-box;
@@ -92,6 +93,10 @@
                 white-space: nowrap;
                 display: blockr;
                 padding-right: 10px;
+            }
+            .select-file-container .choose-file-list-container .file-item .cancel {
+                flex-shrink: 0;
+                flex-grow: 0;
             }
             .select-file-container .upload-submit-btn {
                 width: 100%;
@@ -296,6 +301,7 @@
                     const resText = JSON.parse(xhr.responseText)
                     if (resText.status === 0) {
                         progressBarObserver.data.progress = 0
+                        selectFileObserver.data.splice(0)
                         alert('上传成功')
                     } else {
                         progressBarObserver.data.progress = 0

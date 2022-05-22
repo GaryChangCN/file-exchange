@@ -4,9 +4,10 @@
         "experimentalDecorators": true,
         "esModuleInterop": true,
         "allowJs": false,
-        "outDir": "./build",
+        "outDir": "./dist",
         "typeRoots": ["./node_modules/@types"],
         "target": "ES6",
+        "module": "commonjs"
     },
     "include": ["src/**/*"]
 }
