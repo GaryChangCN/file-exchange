@@ -168,8 +168,8 @@
         }
 
         class ObservereData {
-            cbs = []
             constructor(data) {
+                this.cbs = []
                 this.__data__ = data
                 this.__proxy_data__ = this.__hook__(data)
             }
