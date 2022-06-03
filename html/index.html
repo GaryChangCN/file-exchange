@@ -250,7 +250,7 @@
             if (!target.classList.contains('cancel')) {
                 return
             }
-            const parentChildrens = Array.from(target.parentElement.children)
+            const parentChildrens = Array.from(target.parentElement.parentElement.children)
             const index = parentChildrens.indexOf(target)
             selectFileObserver.data.splice(index, 1)
             selectFileObserver.data = selectFileObserver.data
@@ -295,27 +295,31 @@
                 if (xhr.readyState !== 4) {
                     return
                 }
-
+                let success = false
+                let resText
                 if (xhr.status >= 200 && xhr.status < 300) {
                     // 上传成功
-                    const resText = JSON.parse(xhr.responseText)
+                    resText = JSON.parse(xhr.responseText)
                     if (resText.status === 0) {
-                        progressBarObserver.data.progress = 0
                         selectFileObserver.data.splice(0)
-                        alert('上传成功')
+                        success = true
                     } else {
                         progressBarObserver.data.progress = 0
-                        alert('上传失败')
+                        success = false
                     }
-                    return
                 }
                 progressBarObserver.data.progress = 0
-                alert('上传失败')
+                if (success) {
+                    alert('上传成功')
+                } else {
+                    alert('上传失败: ' + resText && resText.error || '')
+
+                }
             }
 
             xhr.upload.onprogress = function (e) {
                 if (e.lengthComputable) {
-                    progressBarObserver.data.progress = e.loaded / e.total
+                    progressBarObserver.data.progress = (e.loaded / e.total) * 100
                     
                 }
             }
