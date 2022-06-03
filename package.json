@@ -17,6 +17,7 @@
   "repository": {
     "directory": "https://github.com/GaryChangCN/file-exchange"
   },
+  "homepage": "https://github.com/GaryChangCN/file-exchange",
   "license": "./LICENSE",
   "scripts": {
     "dev": "onchange -i -k 'src/**/*.ts' -- ts-node src/index.ts",
@@ -28,7 +29,8 @@
   },
   "files": [
     "dist/**/*",
-    "html/*"
+    "html/*",
+    "./readme.md"
   ],
   "devDependencies": {
     "@types/formidable": "^2.0.5",
