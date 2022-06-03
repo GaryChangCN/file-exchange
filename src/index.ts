@@ -7,6 +7,7 @@ import config from './config'
 import { Optional } from './typings'
 import errorMiddleware from './middlewares/error.middleware'
 import type http from 'http'
+import uploadTipsController from './controllers/upload-tips.controller'
 
 function main(opt?: Optional<typeof config>, listenCB?: (server: http.Server) => void) {
     Object.assign(config, opt || {})
@@ -16,7 +17,7 @@ function main(opt?: Optional<typeof config>, listenCB?: (server: http.Server) =>
     // 网页端
     router.get('/', webController)
     // 上传文件
-    router.post('/api/upload', errorMiddleware, uploadController)
+    router.post('/api/upload', errorMiddleware, uploadTipsController, uploadController)
 
     // 路由中间件
     app.use(router.routes()).use(router.allowedMethods())

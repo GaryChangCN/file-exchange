@@ -33,10 +33,13 @@ const uploadController: Router.IMiddleware = async (ctx, next) => {
         const file = result.files[id] as formidable.File
     
         const tmpFilePath = file.filepath
-
-        await fs.move(tmpFilePath, path.resolve(config.fileDir, name))
+        const newPath = path.resolve(config.fileDir, name)
+        await fs.move(tmpFilePath, newPath)
+        info.newPath = newPath
         fs.remove(tmpFilePath).catch(() => null)
     }
+
+    ctx.req['fileInfos'] = fileInfos
 
     ctx.body = new CommonResponse().setData('ok')
 }
