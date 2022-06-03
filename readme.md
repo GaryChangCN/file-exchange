@@ -11,15 +11,19 @@ npm install file-exchange -g
 file-exchange
 ```
 
-then you can get Link with QRCode
+then you can get Link with QRCode.
 
-![3232](https://raw.githubusercontent.com/GaryChangCN/file-exchange/docs/usage1.png)
+Example:
+
+<img alt="start" src="https://github.com/GaryChangCN/file-exchange/raw/main/docs/usage1.png" width="150"/>
 
 ### Step2
 
-Open Link Or Scean QRCode 
+Open Link Or Scean QRCode.
 
-![3232](https://raw.githubusercontent.com/GaryChangCN/file-exchange/docs/usage2.png)
+Example:
+
+<img alt="use" src="https://github.com/GaryChangCN/file-exchange/raw/main/docs/usage2.png" width="150"/>
 
 Upload file 👾
 
