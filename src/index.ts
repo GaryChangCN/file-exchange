@@ -1,13 +1,15 @@
 import Koa from 'koa'
 import Router from 'koa-router'
+import Mount from 'koa-mount'
 import type { AddressInfo } from 'net'
-import webController from './controllers/web.controller'
 import uploadController from './controllers/upload.controller'
 import config from './config'
 import { Optional } from './typings'
 import errorMiddleware from './middlewares/error.middleware'
 import type http from 'http'
-import uploadTipsController from './controllers/upload-tips.controller'
+import fileListController from './controllers/file-list.controller'
+import serve from 'koa-static'
+import path from 'path'
 
 function main(opt?: Optional<typeof config>, listenCB?: (server: http.Server) => void) {
     Object.assign(config, opt || {})
@@ -15,12 +17,19 @@ function main(opt?: Optional<typeof config>, listenCB?: (server: http.Server) =>
     const router = new Router()
 
     // 网页端
-    router.get('/', webController)
-    // 上传文件
-    router.post('/api/upload', errorMiddleware, uploadTipsController, uploadController)
+    app.use(Mount('/', serve(path.resolve(__dirname, '../html'))))
+    // static 中间件，提供静态资源供下载
+    app.use(Mount('/static', serve(config.fileDir)))
 
-    // 路由中间件
-    app.use(router.routes()).use(router.allowedMethods())
+    // 路由中间件 /api/*
+    app.use(Mount('/api', errorMiddleware))
+    app.use(Mount('/api', router.routes()))
+    app.use(Mount('/api', router.allowedMethods()))
+
+    // 路由表
+    // 上传文件
+    router.post('/upload', uploadController)
+    router.get('/file-tree/(.*)', fileListController)
 
     const server = app.listen(config.workPort, '0.0.0.0', () => {
         listenCB?.(server)
@@ -31,10 +40,13 @@ function main(opt?: Optional<typeof config>, listenCB?: (server: http.Server) =>
 
 export default main
 
-main({
-    workPort: 3001,
-    fileDir: process.cwd()
-}, server => {
-    const port = (server.address() as AddressInfo).port
-    console.log('port', port)
-})
+main(
+    {
+        workPort: 3001,
+        fileDir: process.cwd(),
+    },
+    server => {
+        const port = (server.address() as AddressInfo).port
+        console.log('port', port)
+    },
+)
