@@ -7,7 +7,8 @@
         "outDir": "./dist",
         "typeRoots": ["./node_modules/@types"],
         "target": "ES6",
-        "module": "commonjs"
+        "module": "commonjs",
+        "preserveConstEnums": true
     },
     "include": ["src/**/*"]
 }
