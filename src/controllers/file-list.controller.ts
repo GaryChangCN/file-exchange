@@ -4,7 +4,8 @@ import fs from 'fs-extra'
 import { CommonError } from '../error/common.error'
 import ErrorCode from '../error/error-code'
 import path from 'path'
-import { FileNode, FileList } from '../typings'
+import { FileList } from '../typings'
+import CommonResponse from '../responses/common.response'
 
 const fileListController: Router.IMiddleware = async (ctx, next) => {
     try {
@@ -25,6 +26,7 @@ const fileListController: Router.IMiddleware = async (ctx, next) => {
         const list = await fs.readdir(wantAbsolutePath)
 
         const fileList: FileList = {
+            current: wantPath, 
             parent: wantAbsolutePath === config.fileDir ? null : path.join(wantPath, '../'),
             files: [],
         }
@@ -48,7 +50,7 @@ const fileListController: Router.IMiddleware = async (ctx, next) => {
             return a.fileName.localeCompare(b.fileName)
         })
 
-        ctx.body = fileList
+        ctx.body = new CommonResponse().setData(fileList)
     } catch (error) {
         throw new CommonError(ErrorCode.NORMAL, error.message)
     }

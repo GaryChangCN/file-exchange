@@ -5,130 +5,10 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>File Exchange</title>
-        <style>
-            body {
-                padding: 0;
-                margin: 0;
-                background-color: #eee;
-                font-family: system-ui, -apple-system, BlinkMacSystemFont, segoe ui, Roboto, Helvetica, Arial, sans-serif;
-            }
-            * {
-                box-sizing: border-box;
-            }
-            .button {
-                width: fit-content;
-                height: 50px;
-                background-color: rgb(14, 83, 129);
-                color: #fff;
-                line-height: 50px;
-                text-align: center;
-                padding: 0 5px;
-                font-size: 20px;
-                cursor: pointer;
-                border-radius: 10px;
-            }
-            .button:active {
-                background-color: rgb(10, 61, 95);
-            }
-            #content {
-                padding: 0 15px;
-                padding-top: 30px;
-            }
-            .select-file-container {
-                display: flex;
-                align-items: center;
-                flex-direction: column;
-                border-radius: 10px;
-                padding: 30px;
-                background-color: #fff;
-            }
-            .select-file-container .select-file-btn {
-                position: relative;
-                width: 100%;
-                height: 50px;
-            }
-            .select-file-container .select-file-btn .upload-visual {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: 100%;
-                z-index: 1;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .select-file-container .select-file-btn input {
-                width: 100%;
-                height: 100%;
-                left: 0;
-                top: 0;
-                position: relative;
-                z-index: 2;
-                /* visibility: hidden; */
-                cursor: pointer;
-                opacity: 0;
-            }
-            .select-file-container .choose-file-list-container {
-                display: flex;
-                flex-direction: column;
-                margin-top: 20px;
-                width: 100%;
-            }
-            .select-file-container .choose-file-list-container .file-item {
-                width: 100%;
-                display: flex;
-                justify-content: space-between;
-                height: 40px;
-                align-items: center;
-                padding: 0 10px;
-            }
-            .select-file-container .choose-file-list-container .file-item:nth-child(odd) {
-                background-color: #eee;
-            }
-            .select-file-container .choose-file-list-container .file-item .name {
-                flex-grow: 1;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                display: blockr;
-                padding-right: 10px;
-            }
-            .select-file-container .choose-file-list-container .file-item .cancel {
-                flex-shrink: 0;
-                flex-grow: 0;
-            }
-            .select-file-container .upload-submit-btn {
-                width: 100%;
-                margin-top: 10px;
-            }
-
-            .upload-container {
-                border-radius: 10px;
-                background-color: #fff;
-                margin-top: 30px;
-                width: 100%;
-                padding: 30px;
-            }
-
-            .upload-container .progress-bar {
-                width: 100%;
-                height: 2px;
-                background-color: rgb(255, 255, 255);
-                margin-bottom: 10px;
-            }
-
-            .upload-container .progress-bar .inner {
-                height: 2px;
-                width: 0%;
-                background-color: rgb(121, 121, 121);
-                transition: width 0.2s;
-            }
-
-            .upload-container .upload-submit-btn {
-                width: 100%;
-            }
-        </style>
+        <meta name="apple-mobile-web-app-capable" content="yes" /> 
+        <!-- <meta name="theme-color" content="#fff"> -->
+        <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        <link rel="stylesheet" href="style.css">
     </head>
     <body>
         <div id="content">
@@ -148,183 +28,25 @@
                 </div>
                 <div id="upload-submit-btn" class="button upload-submit-btn">Upload</div>
             </div>
+
+            <div class="file-list-container">
+                <div class="file-actions">
+                    <div class="current-dir">
+                        <span class="current-dir-label">
+                            Current directory:
+                        </span>
+                        <span id="current-dir-name">
+                        </span>
+                    </div>
+                    <div id="fresh-file-list" class="button fresh" style="display: none;">
+                        fresh
+                    </div>
+                </div>
+                <ul id="file-lists">
+                </ul>
+            </div>
         </div>
     </body>
 
-    <script>
-        const elements = {
-            selectFileInput: document.getElementById('select-file'),
-            choosedListEl: document.getElementById('choose-files'),
-            uploadSubmitEl: document.getElementById('upload-submit-btn'),
-            uploadContainerEl: document.getElementById('upload-container'),
-            progressBarEl: document.getElementById('progress-bar'),
-        }
-
-        const uniqueId = {
-            index: 1,
-            get: () => {
-                return ++uniqueId.index
-            },
-        }
-
-        class ObservereData {
-            constructor(data) {
-                this.cbs = []
-                this.__data__ = data
-                this.__proxy_data__ = this.__hook__(data)
-            }
-
-            __hook__(data) {
-                const self = this
-                return new Proxy(data, {
-                    get: function (target, key, receiver) {
-                        return Reflect.get(target, key, receiver)
-                    },
-                    set: function (target, key, value, receiver) {
-                        setTimeout(() => {
-                            self.cbs.forEach(cb => {
-                                cb(self.__data__)
-                            })
-                        }, 0)
-                        return Reflect.set(target, key, value, receiver)
-                    },
-                })
-            }
-
-            get data() {
-                return this.__proxy_data__
-            }
-
-            set data(value) {
-                return this.__proxy_data__ = this.__hook__(value)
-            }
-
-            watch(cb) {
-                this.cbs.push(cb)
-            }
-        }
-
-        const selectFileObserver = new ObservereData([])
-        // 绑定视图  【已选列表】
-        selectFileObserver.watch(() => {
-            const str = selectFileObserver.data
-                .map(file => {
-                    const { name, size } = file
-                    return `<div class="file-item">
-                    <span class="name">
-                        ${name}
-                        <span class="size">
-                            ${size}
-                        </span>
-                    </span>
-                    <span class="cancel">
-                        取消
-                    </span>
-                </div>`
-                })
-                .join('')
-
-            elements.choosedListEl.innerHTML = str
-        })
-
-        // 绑定视图 【提交按钮显示隐藏】
-        selectFileObserver.watch(() => {
-            elements.uploadContainerEl.style.display = selectFileObserver.data.length === 0 ? 'none' : 'block'
-        })
-
-        const progressBarObserver = new ObservereData({ progress: 0 })
-
-        progressBarObserver.watch(() => {
-            const progress = progressBarObserver.data.progress
-            if (progress === 0 || progress === 100) {
-                elements.progressBarEl.style.display = 'none'
-            } else {
-                elements.progressBarEl.style.display = 'block'
-            }
-            elements.progressBarEl.children[0].style.width = progress + '%'
-        })
-
-        // 监听取消操作
-        elements.choosedListEl.addEventListener('click', e => {
-            const target = e.target
-            if (!target.classList.contains('cancel')) {
-                return
-            }
-            const parentChildrens = Array.from(target.parentElement.parentElement.children)
-            const index = parentChildrens.indexOf(target)
-            selectFileObserver.data.splice(index, 1)
-            selectFileObserver.data = selectFileObserver.data
-        })
-
-        // 监听用户选择文件的变动
-        elements.selectFileInput.addEventListener('change', e => {
-            const files = Array.from(e.target.files || 0)
-            files.forEach(file => {
-                if (selectFileObserver.data.indexOf(file) > -1) {
-                    return
-                }
-                selectFileObserver.data.push(file)
-
-            })
-        })
-
-        // 监听上传按钮操作
-        elements.uploadSubmitEl.addEventListener('click', () => {
-            const form = new FormData()
-            const map = new WeakMap()
-            const fileInfos = selectFileObserver.data.map(file => {
-                const id = uniqueId.get()
-                map.set(file, id)
-                return {
-                    name: file.name,
-                    id,
-                    size: file.size,
-                }
-            })
-            form.append('fileInfos', JSON.stringify(fileInfos))
-            selectFileObserver.data.forEach(file => {
-                const id = map.get(file)
-                form.append(id, file)
-            })
-
-            const xhr = new XMLHttpRequest()
-
-            xhr.open('POST', '/api/upload')
-
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState !== 4) {
-                    return
-                }
-                let success = false
-                let resText
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    // 上传成功
-                    resText = JSON.parse(xhr.responseText)
-                    if (resText.status === 0) {
-                        selectFileObserver.data.splice(0)
-                        success = true
-                    } else {
-                        progressBarObserver.data.progress = 0
-                        success = false
-                    }
-                }
-                progressBarObserver.data.progress = 0
-                if (success) {
-                    alert('上传成功')
-                } else {
-                    alert('上传失败: ' + resText && resText.error || '')
-
-                }
-            }
-
-            xhr.upload.onprogress = function (e) {
-                if (e.lengthComputable) {
-                    progressBarObserver.data.progress = (e.loaded / e.total) * 100
-                    
-                }
-            }
-
-            xhr.send(form)
-        })
-    </script>
+    <script src="index.js"></script>
 </html>
