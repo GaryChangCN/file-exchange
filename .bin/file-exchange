@@ -23,7 +23,7 @@ const config = {
     workPort: opts.port,
 }
 
-if (!fs.statSync().isDirectory()) {
+if (!fs.statSync(config.fileDir).isDirectory()) {
     console.error('work path must be dir')
     process.exit(0)
 }
