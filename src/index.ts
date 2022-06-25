@@ -40,13 +40,13 @@ function main(opt?: Optional<typeof config>, listenCB?: (server: http.Server) =>
 
 export default main
 
-main(
-    {
-        workPort: 3001,
-        fileDir: process.cwd(),
-    },
-    server => {
-        const port = (server.address() as AddressInfo).port
-        console.log('port', port)
-    },
-)
+// main(
+//     {
+//         workPort: 3001,
+//         fileDir: process.cwd(),
+//     },
+//     server => {
+//         const port = (server.address() as AddressInfo).port
+//         console.log('port', port)
+//     },
+// )
